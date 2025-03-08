@@ -1,7 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// Création d'un tournoi
+// Creating a tournament
 exports.createTournament = async (req, res) => {
   try {
     const { name, description, date } = req.body;
@@ -14,7 +14,7 @@ exports.createTournament = async (req, res) => {
   }
 };
 
-// Récupération de tous les tournois en base
+// Retrieving all tournaments in the database
 exports.getAllTournaments = async (req, res) => {
   try {
     const tournaments = await prisma.tournament.findMany();
@@ -24,7 +24,7 @@ exports.getAllTournaments = async (req, res) => {
   }
 };
 
-// Récupération d'un tournoi par ID
+// Retrieving a tournament by ID
 exports.getTournamentById = async (red, res) => {
   try {
     const tournament = await prisma.tournament.findUnique({
@@ -36,7 +36,7 @@ exports.getTournamentById = async (red, res) => {
   }
 };
 
-// Suppression d'un tournoi
+// Deleting a tournament
 exports.deleteTournament = async (req, res) => {
   try {
     await prisma.tournament.delete({
