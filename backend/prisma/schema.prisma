@@ -12,3 +12,37 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Tournament {
+  id          String  @id @default(uuid()) //ID Unique
+  name        String
+  description String?
+  date        DateTime
+  teams       Team[]
+  matches     Match[]
+  createdAt   DateTime @default(now())
+}
+
+model Team {
+  id            String  @id @default(uuid())
+  name          String
+  tournament    Tournament @relation(fields: [tournamentId], references: [id])
+  tournamentId  String
+  matchesHome   Match[] @relation("HomeTeam")
+  matchesAway   Match[] @relation("AwayTeam")
+  createdAt     DateTime @default(now())
+}
+
+model Match {
+  id            String  @id @default(uuid())
+  tournament    Tournament @relation(fields: [tournamentId], references: [id])
+  tournamentId  String
+  homeTeam      Team  @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  homeTeamId    String
+  awayTeam      Team @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  awayTeamId    String
+  homeScore     Int?
+  awayScore     Int?
+  winnerId      String?
+  createdAt     DateTime @default(now())
+}
