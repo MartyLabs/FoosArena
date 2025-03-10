@@ -6,5 +6,9 @@ router.post("/", tournamentController.createTournament);
 router.get("/", tournamentController.getAllTournaments);
 router.get("/:id", tournamentController.getTournamentById);
 router.delete("/:id", tournamentController.deleteTournament);
+router.get(
+  "/:tournamentId/leaderboard",
+  tournamentController.getTournamentLeaderboard
+);
 
 module.exports = router;

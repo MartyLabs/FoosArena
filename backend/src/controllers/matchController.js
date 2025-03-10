@@ -21,13 +21,13 @@ exports.generateMatches = async (req, res) => {
       return res.status(400).json({ message: "At least 2 teams are required" });
 
     // Generate all team combinations
-    const matches = teams.flatMap((homeTeam, i) =>
-      teams.slice(i + 1).map((awayTeam) => ({
+    const matches = teams.flatMap((team1, i) =>
+      teams.slice(i + 1).map((team2) => ({
         tournamentId,
-        homeTeamId: homeTeam.id,
-        awayTeamId: awayTeam.id,
-        homeScore: null,
-        awayScore: null,
+        team1Id: team1.id,
+        team2Id: team2.id,
+        score1: null,
+        score2: null,
         winnerId: null,
       }))
     );
@@ -48,7 +48,7 @@ exports.generateMatches = async (req, res) => {
 exports.updateMatchScore = async (req, res) => {
   try {
     const { matchId } = req.params;
-    const { homeScore, awayScore } = req.body;
+    const { score1, score2 } = req.body;
 
     const match = await prisma.match.findUnique({
       where: { id: matchId },
@@ -58,16 +58,16 @@ exports.updateMatchScore = async (req, res) => {
 
     // Determine the winner
     let winnerId = null;
-    if (homeScore > awayScore) {
-      winnerId = match.homeTeamId;
-    } else if (awayScore > homeScore) {
-      winnerId = match.awayTeamId;
+    if (score1 > score2) {
+      winnerId = match.team1Id;
+    } else if (score2 > score1) {
+      winnerId = match.team2Id;
     }
 
     // Update score inside database
-    const updateMatch = await prisma.match.update({
+    const updatedMatch = await prisma.match.update({
       where: { id: matchId },
-      data: { homeScore, awayScore, winnerId },
+      data: { score1, score2, winnerId },
     });
 
     res
@@ -85,12 +85,28 @@ exports.getMatchesByTournament = async (req, res) => {
 
     const matches = await prisma.match.findMany({
       where: { tournamentId: tournamentId },
-      include: { homeTeam: true, awayTeam: true },
+      include: { team1: true, team2: true },
     });
 
     res
       .status(200)
       .json({ message: "Matches successfully found", matches: matches });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getMatchesByTeam = async (req, res) => {
+  try {
+    const { teamId } = req.params;
+
+    const matches = await prisma.match.findMany({
+      where: {
+        OR: [{ team1Id: teamId }, { team2Id: teamId }],
+      },
+    });
+
+    res.json(matches);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

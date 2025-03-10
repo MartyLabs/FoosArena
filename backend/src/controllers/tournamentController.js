@@ -47,3 +47,69 @@ exports.deleteTournament = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Get tournament leaderboard
+exports.getTournamentLeaderboard = async (req, res) => {
+  try {
+    const { tournamentId } = req.params;
+
+    // Récupérer toutes les équipes du tournoi
+    const teams = await prisma.team.findMany({
+      where: { tournamentId },
+    });
+
+    if (!teams.length)
+      return res
+        .status(404)
+        .json({ message: "Aucune équipe trouvée pour ce tournoi" });
+
+    let leaderboard = [];
+
+    for (const team of teams) {
+      let wins = 0,
+        losses = 0,
+        gamesPlayed = 0,
+        points = 0;
+
+      // Récupérer tous les matchs où l'équipe a joué
+      const matches = await prisma.match.findMany({
+        where: {
+          tournamentId,
+          OR: [{ team1Id: team.id }, { team2Id: team.id }],
+        },
+      });
+
+      matches.forEach((match) => {
+        if (match.score1 !== null && match.score2 !== null) {
+          gamesPlayed++;
+
+          // Vérifier si l'équipe était team1 ou team2
+          const isTeam1 = match.team1Id === team.id;
+          const isWinner = match.winnerId === team.id;
+
+          if (isWinner) {
+            wins++;
+            points += 3;
+          } else {
+            losses++;
+          }
+        }
+      });
+
+      leaderboard.push({
+        teamName: team.name,
+        gamesPlayed,
+        wins,
+        losses,
+        points,
+      });
+    }
+
+    // Trier le classement par points (descendant)
+    leaderboard.sort((a, b) => b.points - a.points);
+
+    res.json(leaderboard);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
