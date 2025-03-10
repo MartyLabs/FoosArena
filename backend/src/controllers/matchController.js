@@ -1,4 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
+
+const logger = require("../utils/logger");
 const prisma = new PrismaClient();
 
 // Match Generation (Each team must meet at least once)
@@ -40,6 +42,7 @@ exports.generateMatches = async (req, res) => {
       matches: createdMatches,
     });
   } catch (error) {
+    logger.error(`Error creating a match: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };
@@ -74,6 +77,7 @@ exports.updateMatchScore = async (req, res) => {
       .status(200)
       .json({ message: "Score has been updated", match: updatedMatch });
   } catch (error) {
+    logger.error(`Error updating a match: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };
@@ -92,6 +96,7 @@ exports.getMatchesByTournament = async (req, res) => {
       .status(200)
       .json({ message: "Matches successfully found", matches: matches });
   } catch (error) {
+    logger.error(`Error retieving a match by tournament: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };
@@ -108,6 +113,7 @@ exports.getMatchesByTeam = async (req, res) => {
 
     res.json(matches);
   } catch (error) {
+    logger.error(`Error retieving a match by team: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };

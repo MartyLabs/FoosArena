@@ -1,4 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
+
+const logger = require("../utils/logger");
 const prisma = new PrismaClient();
 
 // Add team to a tournament
@@ -20,6 +22,7 @@ exports.addTeam = async (req, res) => {
 
     res.status(201).json(team);
   } catch (error) {
+    logger.error(`Error creating a team: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };
@@ -35,6 +38,7 @@ exports.getTeamsByTournament = async (req, res) => {
 
     res.status(200).json(teams);
   } catch (error) {
+    logger.error(`Error retrieving a team by tournament: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };
@@ -52,6 +56,7 @@ exports.getTeamById = async (req, res) => {
 
     res.status(200).json(team);
   } catch (error) {
+    logger.error(`Error retrieving a team by id: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };
@@ -67,6 +72,7 @@ exports.deleteTeam = async (req, res) => {
 
     res.status(204).send();
   } catch (error) {
+    logger.error(`Error deleting a team: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };

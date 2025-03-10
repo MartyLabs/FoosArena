@@ -1,15 +1,20 @@
 const { PrismaClient } = require("@prisma/client");
+
+const logger = require("../utils/logger");
 const prisma = new PrismaClient();
 
 // Creating a tournament
 exports.createTournament = async (req, res) => {
   try {
     const { name, description, date } = req.body;
+
     const newTournament = await prisma.tournament.create({
       data: { name, description, date: new Date(date) },
     });
+
     res.status(201).json(newTournament);
   } catch (error) {
+    logger.error(`Error creating a tournament: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };
@@ -20,18 +25,20 @@ exports.getAllTournaments = async (req, res) => {
     const tournaments = await prisma.tournament.findMany();
     res.json(tournaments);
   } catch (error) {
+    logger.error(`Error retrieving tournaments: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };
 
 // Retrieving a tournament by ID
-exports.getTournamentById = async (red, res) => {
+exports.getTournamentById = async (req, res) => {
   try {
     const tournament = await prisma.tournament.findUnique({
       where: { id: req.params.id },
     });
     res.json(tournament);
   } catch (error) {
+    logger.error(`Error retrieving a tournament: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };
@@ -44,6 +51,7 @@ exports.deleteTournament = async (req, res) => {
     });
     res.status(204).send();
   } catch (error) {
+    logger.error(`Error deleting a tournament: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };
@@ -61,7 +69,7 @@ exports.getTournamentLeaderboard = async (req, res) => {
     if (!teams.length)
       return res
         .status(404)
-        .json({ message: "Aucune équipe trouvée pour ce tournoi" });
+        .json({ message: "No teams found for this tournament" });
 
     let leaderboard = [];
 
@@ -71,7 +79,7 @@ exports.getTournamentLeaderboard = async (req, res) => {
         gamesPlayed = 0,
         points = 0;
 
-      // Récupérer tous les matchs où l'équipe a joué
+      // Retrieve all matches the team played in
       const matches = await prisma.match.findMany({
         where: {
           tournamentId,
@@ -83,8 +91,6 @@ exports.getTournamentLeaderboard = async (req, res) => {
         if (match.score1 !== null && match.score2 !== null) {
           gamesPlayed++;
 
-          // Vérifier si l'équipe était team1 ou team2
-          const isTeam1 = match.team1Id === team.id;
           const isWinner = match.winnerId === team.id;
 
           if (isWinner) {
@@ -105,11 +111,12 @@ exports.getTournamentLeaderboard = async (req, res) => {
       });
     }
 
-    // Trier le classement par points (descendant)
+    // Sort ranking by points (descending)
     leaderboard.sort((a, b) => b.points - a.points);
 
     res.json(leaderboard);
   } catch (error) {
+    logger.error(`Error retrieving leaderboard: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };
