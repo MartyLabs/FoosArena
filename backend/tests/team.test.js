@@ -14,11 +14,17 @@ describe("Team API Tests", () => {
 
     await prisma.$executeRaw`TRUNCATE TABLE "Match", "Team", "Tournament" RESTART IDENTITY CASCADE;`;
 
-    const tournament = await prisma.tournament.create({
+    await prisma.tournament.create({
       data: { name: "Tournoi Test", date: new Date(), description: "Test" },
     });
 
-    tournamentId = tournament.id;
+    const tournament = await prisma.tournament.findFirst({
+      where: { name: "Tournoi Test" },
+    });
+
+    tournamentId = tournament ? tournament.id : null;
+
+    console.log("Tournament ID after creation:", tournamentId);
   });
 
   afterAll(async () => {
@@ -32,6 +38,8 @@ describe("Team API Tests", () => {
       name: teamName,
       tournamentId,
     });
+
+    console.log("Response from POST /teams:", res.body);
 
     expect(res.statusCode).toBe(201);
     expect(res.body.name).toBe(teamName);
