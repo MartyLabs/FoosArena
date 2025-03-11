@@ -1,15 +1,10 @@
 name: CI/CD Pipeline
 
 on:
-  push:
-    branches:
-      - main
-      - dev
   pull_request:
     branches:
       - main
       - dev
-    types: [opened, synchronize]
 
 jobs:
   tests:
@@ -19,12 +14,6 @@ jobs:
     steps:
       - name: Code Checkout
         uses: actions/checkout@v3
-
-      - name: Vérifier les permissions
-        run: |
-          echo "Actor: ${{ github.actor }}"
-          echo "Repository: ${{ github.repository }}"
-          echo "Event: ${{ github.event_name }}"
 
       - name: Docker Compose Installation
         run: |
@@ -50,10 +39,6 @@ jobs:
 
       - name: Set DATABASE_URL for GitHub Actions
         run: echo "DATABASE_URL=postgresql://user:password@localhost:5432/tournament_db" >> $GITHUB_ENV
-
-      - name: Migrer la base de données avec Prisma
-        run: |
-          docker exec $(docker ps -qf "name=backend") npx prisma migrate deploy
 
       - name: Synchronize Prisma with the base
         run: docker exec $(docker ps -qf "name=backend") npx prisma db push
