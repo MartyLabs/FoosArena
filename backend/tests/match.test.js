@@ -8,9 +8,11 @@ let tournamentId, team1Id, team2Id;
 
 describe("Match API Tests", () => {
   beforeAll(async () => {
-    await prisma.match.deleteMany();
-    await prisma.team.deleteMany();
-    await prisma.tournament.deleteMany();
+    await prisma.$transaction([
+      prisma.match.deleteMany(),
+      prisma.team.deleteMany(),
+      prisma.tournament.deleteMany(),
+    ]);
 
     const tournament = await prisma.tournament.create({
       data: {

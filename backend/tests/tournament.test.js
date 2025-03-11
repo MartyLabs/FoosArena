@@ -8,9 +8,11 @@ let tournamentId;
 
 describe("Tournament API Tests", () => {
   beforeAll(async () => {
-    await prisma.match.deleteMany();
-    await prisma.team.deleteMany();
-    await prisma.tournament.deleteMany();
+    await prisma.$transaction([
+      prisma.match.deleteMany(),
+      prisma.team.deleteMany(),
+      prisma.tournament.deleteMany(),
+    ]);
   });
 
   afterAll(async () => {

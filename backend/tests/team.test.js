@@ -8,9 +8,11 @@ let tournamentId, teamId;
 
 describe("Team API Tests", () => {
   beforeAll(async () => {
-    await prisma.match.deleteMany();
-    await prisma.team.deleteMany();
-    await prisma.tournament.deleteMany();
+    await prisma.$transaction([
+      prisma.match.deleteMany(),
+      prisma.team.deleteMany(),
+      prisma.tournament.deleteMany(),
+    ]);
 
     const tournament = await prisma.tournament.create({
       data: { name: "Tournoi Test", date: new Date(), description: "Test" },
