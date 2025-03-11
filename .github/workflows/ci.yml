@@ -43,6 +43,13 @@ jobs:
       - name: Synchronize Prisma with the base
         run: docker exec $(docker ps -qf "name=backend") npx prisma db push
 
+      - name: Migrer la base de données Prisma
+        run: |
+          docker exec $(docker ps -qf "name=backend") npx prisma migrate deploy
+      - name: Attendre que le backend soit prêt
+        run: sleep 5
+      - name: Vérifier les logs du backend
+        run: docker logs $(docker ps -qf "name=backend")
       - name: Run backend tests
         run: docker exec $(docker ps -qf "name=backend") npm run test
 
