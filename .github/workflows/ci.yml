@@ -15,16 +15,6 @@ jobs:
     name: Run Backend Tests
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: tournament_db
-        ports:
-          - 5432:5432
-
     steps:
       - name: 🔄 Checkout du code
         uses: actions/checkout@v3
@@ -49,6 +39,9 @@ jobs:
 
       - name: 🚀 Démarrer le backend
         run: docker compose up --build -d backend
+
+      - name: 🔄 Définir DATABASE_URL pour GitHub Actions
+        run: echo "DATABASE_URL=postgresql://user:password@localhost:5432/tournament_db" >> $GITHUB_ENV
 
       - name: 📜 Synchroniser Prisma avec la base
         run: docker exec $(docker ps -qf "name=backend") npx prisma db push
