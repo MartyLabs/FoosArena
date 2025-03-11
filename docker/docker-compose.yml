@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   database:
+    container_name: database
     image: postgres:13
     restart: always
     environment:
@@ -14,6 +15,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   backend:
+    container_name: backend
     build:
       context: ../backend
       dockerfile: Dockerfile
@@ -25,6 +27,7 @@ services:
       DATABASE_URL: "postgresql://user:password@database:5432/tournament_db"
 
   frontend:
+    container_name: frontend
     build:
       context: ../frontend
       dockerfile: Dockerfile
