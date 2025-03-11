@@ -30,6 +30,7 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: "postgresql://user:password@database:5432/tournament_db"
+    entrypoint: ["/bin/sh", "-c", "npx prisma migrate deploy && npm start"]
 
   frontend:
     container_name: frontend
