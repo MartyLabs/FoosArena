@@ -52,6 +52,7 @@ jobs:
 
       - name: 🛑 Arrêter les containers après tests
         run: docker compose down
+        working-directory: docker
 
   build-and-push:
     if: github.ref == 'refs/heads/main'
