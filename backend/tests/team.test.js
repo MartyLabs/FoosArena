@@ -9,10 +9,9 @@ let tournamentId, teamId;
 describe("Team API Tests", () => {
   beforeAll(async () => {
     await prisma.match.deleteMany();
-    await prisma.team.deleteMany();
     await prisma.tournament.deleteMany();
 
-    await prisma.$executeRaw`TRUNCATE TABLE "Match", "Team", "Tournament" RESTART IDENTITY CASCADE;`;
+    await prisma.$executeRaw`TRUNCATE TABLE "Match", "Tournament" RESTART IDENTITY CASCADE;`;
 
     await prisma.tournament.create({
       data: { name: "Tournoi Test", date: new Date(), description: "Test" },
@@ -42,6 +41,7 @@ describe("Team API Tests", () => {
     console.log("Response from POST /teams:", res.body);
 
     expect(res.statusCode).toBe(201);
+    console.log("Response from POST /teams:", res.body);
     expect(res.body.name).toBe(teamName);
     expect(res.body.id).toBeDefined();
 
