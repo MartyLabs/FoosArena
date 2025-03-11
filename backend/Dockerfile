@@ -7,9 +7,11 @@ RUN npm install
 
 COPY . .
 
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
+
 RUN npx prisma generate
-RUN npx prisma migrate deploy
 
 EXPOSE 5000
 
-CMD ["node", "index.js"]
+ENTRYPOINT ["/bin/sh", "-c", "npx prisma migrate deploy && npm start"]
