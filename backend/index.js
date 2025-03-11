@@ -1,6 +1,8 @@
 require("dotenv").config();
 
 const express = require("express");
+const app = express();
+
 const cors = require("cors");
 const helmet = require("helmet");
 const compression = require("compression");
@@ -11,7 +13,6 @@ const tournamentRoutes = require("./src/routes/tournamentRoutes");
 const matchRoutes = require("./src/routes/matchRoutes");
 const teamRoutes = require("./src/routes/teamRoutes");
 
-const app = express();
 app.use(cors());
 app.use(express.json());
 
