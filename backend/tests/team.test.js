@@ -8,7 +8,7 @@ let tournamentId, teamId;
 
 describe("Team API Tests", () => {
   beforeAll(async () => {
-    await prisma.$executeRaw`TRUNCATE TABLE "Match", "Tournament" RESTART IDENTITY CASCADE;`;
+    await prisma.$executeRaw`TRUNCATE TABLE "Match", "Team", "Tournament" RESTART IDENTITY CASCADE;`;
 
     await prisma.tournament.create({
       data: { name: "Tournoi Test", date: new Date(), description: "Test" },
