@@ -9,6 +9,7 @@ on:
     branches:
       - main
       - dev
+    types: [opened, synchronize]
 
 jobs:
   tests:
@@ -16,41 +17,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🔄 Checkout du code
+      - name: Code Checkout
         uses: actions/checkout@v3
 
-      - name: 📥 Installer Docker Compose
+      - name: Docker Compose Installation
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
-      - name: 🐳 Lancer les services avec Docker Compose
+      - name: Launch services with Docker Compose
         run: |
           cd docker
           docker compose up -d database
           sleep 5
 
-      - name: 🔄 Vérifier la connexion à PostgreSQL
+      - name: Check the connection to PostgreSQL
         run: |
           until docker exec $(docker ps -qf "name=database") pg_isready -U user -d tournament_db; do
             echo "⏳ Waiting for PostgreSQL..."
             sleep 2
           done
 
-      - name: 🚀 Démarrer le backend
+      - name: Start Backend
         run: docker compose up --build -d backend
         working-directory: docker
 
-      - name: 🔄 Définir DATABASE_URL pour GitHub Actions
+      - name: Set DATABASE_URL for GitHub Actions
         run: echo "DATABASE_URL=postgresql://user:password@localhost:5432/tournament_db" >> $GITHUB_ENV
 
-      - name: 📜 Synchroniser Prisma avec la base
+      - name: Synchronize Prisma with the base
         run: docker exec $(docker ps -qf "name=backend") npx prisma db push
 
-      - name: ✅ Exécuter les tests backend
+      - name: Run backend tests
         run: docker exec $(docker ps -qf "name=backend") npm run test
 
-      - name: 🛑 Arrêter les containers après tests
+      - name: Stop containers after testing
         run: docker compose down
         working-directory: docker
 
@@ -60,20 +61,18 @@ jobs:
     needs: tests
 
     steps:
-      - name: 🔄 Checkout du code
+      - name: Code Checkout
         uses: actions/checkout@v3
 
-      - name: 🔑 Se connecter à Docker Hub
+      - name: Connect to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: 🏗️ Build des images Docker
+      - name: Build and push Docker (only on main)
         run: |
-          docker build -t my-backend ./backend
-          docker tag my-backend mydockerhubusername/my-backend:latest
-
-      - name: 📤 Pousser les images sur Docker Hub
-        run: |
-          docker push mydockerhubusername/my-backend:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/tournament-backend:latest ./backend
+          docker push ${{ secrets.DOCKER_USERNAME }}/tournament-backend:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/tournament-frontend:latest ./frontend
+          docker push ${{ secrets.DOCKER_USERNAME }}/tournament-frontend:latest
 
   deploy:
     if: github.ref == 'refs/heads/main'
@@ -81,7 +80,7 @@ jobs:
     needs: build-and-push
 
     steps:
-      - name: 🚀 Déployer sur le serveur
+      - name: Deploy to server
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.SSH_HOST }}
