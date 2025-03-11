@@ -8,7 +8,9 @@ let tournamentId;
 
 describe("Tournament API Tests", () => {
   beforeAll(async () => {
-    await prisma.$executeRaw`TRUNCATE TABLE "Match", "Team", "Tournament" RESTART IDENTITY CASCADE;`;
+    await prisma.match.deleteMany();
+    await prisma.team.deleteMany();
+    await prisma.tournament.deleteMany();
   });
 
   afterAll(async () => {

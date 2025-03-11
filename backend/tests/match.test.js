@@ -8,8 +8,9 @@ let tournamentId, team1Id, team2Id;
 
 describe("Match API Tests", () => {
   beforeAll(async () => {
-    await prisma.$executeRaw`TRUNCATE TABLE "Match", "Team", "Tournament" RESTART IDENTITY CASCADE;`;
-
+    await prisma.match.deleteMany();
+    await prisma.team.deleteMany();
+    await prisma.tournament.deleteMany();
     const tournament = await prisma.tournament.create({
       data: {
         name: "Clementine Tournament",
