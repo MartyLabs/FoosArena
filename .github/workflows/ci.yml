@@ -31,11 +31,8 @@ jobs:
           docker compose up --build -d backend
           sleep 5
 
-      - name: 📜 Afficher les logs du backend
-        run: docker logs backend
-
-      - name: 📋 Lister les containers en cours d'exécution
-        run: docker ps -a
+      - name: Force Prisma Migration to Run
+        run: docker exec $(docker ps -qf "name=backend") npx prisma migrate reset --force
 
       - name: Run backend tests in the container
         run: docker exec $(docker ps -qf "name=backend") npm run test
