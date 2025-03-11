@@ -28,11 +28,20 @@ jobs:
           cd docker
           docker compose up -d database
           sleep 5
-          docker compose up --build -d backend
-          sleep 5
 
-      - name: Force Prisma Migration to Run
-        run: docker exec $(docker ps -qf "name=backend") npx prisma migrate reset --force
+      - name: 🔄 Vérifier la connexion à PostgreSQL
+        run: |
+          until docker exec $(docker ps -qf "name=database") pg_isready -U user -d tournament_db; do
+            echo "⏳ Waiting for PostgreSQL..."
+            sleep 2
+          done
+
+      - name: 🚀 Démarrer le backend
+        run: docker compose up --build -d backend
+        working-directory: docker
+
+      - name: 📜 Vérifier & Appliquer les migrations Prisma
+        run: docker exec $(docker ps -qf "name=backend") npx prisma migrate deploy
 
       - name: Run backend tests in the container
         run: docker exec $(docker ps -qf "name=backend") npm run test
