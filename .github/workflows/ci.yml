@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -12,7 +12,18 @@ on:
 
 jobs:
   tests:
+    name: Run Backend Tests
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: tournament_db
+        ports:
+          - 5432:5432
 
     steps:
       - name: 🔄 Checkout du code
@@ -25,7 +36,6 @@ jobs:
 
       - name: 🐳 Lancer les services avec Docker Compose
         run: |
-          cd docker
           docker compose up -d database
           sleep 5
 
@@ -38,15 +48,11 @@ jobs:
 
       - name: 🚀 Démarrer le backend
         run: docker compose up --build -d backend
-        working-directory: docker
 
-      - name: 🛠️ Vérifier si Prisma trouve bien la base de données
-        run: docker exec $(docker ps -qf "name=backend") npx prisma db pull
-
-      - name: 📜 Synchroniser la base avec Prisma
+      - name: 📜 Synchroniser Prisma avec la base
         run: docker exec $(docker ps -qf "name=backend") npx prisma db push
 
-      - name: ✅ Exécuter les tests backend dans le container
+      - name: ✅ Exécuter les tests backend
         run: docker exec $(docker ps -qf "name=backend") npm run test
 
       - name: 🛑 Arrêter les containers après tests
@@ -58,20 +64,35 @@ jobs:
     needs: tests
 
     steps:
-      - name: Code Checkout
+      - name: 🔄 Checkout du code
         uses: actions/checkout@v3
 
-      - name: Connect to Docker Hub
+      - name: 🔑 Se connecter à Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Building Docker Images
+      - name: 🏗️ Build des images Docker
         run: |
           docker build -t my-backend ./backend
-          docker build -t my-frontend ./frontend
-
-      - name: Pushing Images to Docker Hub
-        run: |
           docker tag my-backend mydockerhubusername/my-backend:latest
-          docker tag my-frontend mydockerhubusername/my-frontend:latest
+
+      - name: 📤 Pousser les images sur Docker Hub
+        run: |
           docker push mydockerhubusername/my-backend:latest
-          docker push mydockerhubusername/my-frontend:latest
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+      - name: 🚀 Déployer sur le serveur
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker pull mydockerhubusername/my-backend:latest
+            docker stop backend || true
+            docker rm backend || true
+            docker run -d --name backend -p 5000:5000 mydockerhubusername/my-backend:latest
