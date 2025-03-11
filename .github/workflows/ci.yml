@@ -36,6 +36,7 @@ jobs:
 
       - name: 🐳 Lancer les services avec Docker Compose
         run: |
+          cd docker
           docker compose up -d database
           sleep 5
 
