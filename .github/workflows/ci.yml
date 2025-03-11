@@ -39,6 +39,7 @@ jobs:
 
       - name: 🚀 Démarrer le backend
         run: docker compose up --build -d backend
+        working-directory: docker
 
       - name: 🔄 Définir DATABASE_URL pour GitHub Actions
         run: echo "DATABASE_URL=postgresql://user:password@localhost:5432/tournament_db" >> $GITHUB_ENV
