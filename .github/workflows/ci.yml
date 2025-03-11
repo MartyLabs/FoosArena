@@ -15,15 +15,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Code Checkout
+      - name: 🔄 Checkout du code
         uses: actions/checkout@v3
 
-      - name: Docker Compose installation
+      - name: 📥 Installer Docker Compose
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
-      - name: Launching Services with Docker Compose
+      - name: 🐳 Lancer les services avec Docker Compose
         run: |
           cd docker
           docker compose up -d database
@@ -40,16 +40,16 @@ jobs:
         run: docker compose up --build -d backend
         working-directory: docker
 
-      - name: 📜 Vérifier & Appliquer les migrations Prisma
-        run: docker exec $(docker ps -qf "name=backend") npx prisma migrate deploy
+      - name: 🛠️ Vérifier si Prisma trouve bien la base de données
+        run: docker exec $(docker ps -qf "name=backend") npx prisma db pull
 
-      - name: Run backend tests in the container
+      - name: 📜 Synchroniser la base avec Prisma
+        run: docker exec $(docker ps -qf "name=backend") npx prisma db push
+
+      - name: ✅ Exécuter les tests backend dans le container
         run: docker exec $(docker ps -qf "name=backend") npm run test
 
-      # - name: Run frontend tests in the container
-      #   run: docker exec $(docker ps -qf "name=frontend") npm run test
-
-      - name: Stop containers after testing
+      - name: 🛑 Arrêter les containers après tests
         run: docker compose down
 
   build-and-push:
