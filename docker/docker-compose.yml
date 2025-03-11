@@ -13,6 +13,10 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U user -d tournament_db"]
+    interval: 5s
+    retries: 5
 
   backend:
     container_name: backend
@@ -22,7 +26,8 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     environment:
       DATABASE_URL: "postgresql://user:password@database:5432/tournament_db"
 
