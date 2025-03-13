@@ -27,6 +27,19 @@ exports.addTeam = async (req, res) => {
   }
 };
 
+exports.updateName = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const updatedTeam = await prisma.team.update({
+      where: { id: req.params.id },
+      data: { name },
+    });
+    res.json(updatedTeam);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Get all teams in the tournament
 exports.getTeamsByTournament = async (req, res) => {
   try {

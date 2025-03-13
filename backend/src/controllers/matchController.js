@@ -117,3 +117,17 @@ exports.getMatchesByTeam = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.deleteMacthes = async (req, res) => {
+  try {
+    const { tournamentId } = req.params;
+
+    await prisma.match.delete.findMany({
+      where: { tournamentId: tournamentId },
+    });
+
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

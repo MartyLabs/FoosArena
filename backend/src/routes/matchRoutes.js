@@ -5,5 +5,6 @@ const matchController = require("../controllers/matchController");
 router.post("/generate/:tournamentId", matchController.generateMatches);
 router.post("/update-score/:matchId", matchController.updateMatchScore);
 router.get("/:tournamentId", matchController.getMatchesByTournament);
+router.delete("/:tournamentId", matchController.deleteMatches);
 
 module.exports = router;
