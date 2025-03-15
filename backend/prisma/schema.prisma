@@ -28,7 +28,7 @@ model Team {
   name         String
   tournament   Tournament @relation(fields: [tournamentId], references: [id])
   tournamentId String
-  // Relation virtuelle pour ne pas casser Prisma
+  // Virtual relationship to avoid breaking Prisma
   matches1     Match[]    @relation("Team1")
   matches2     Match[]    @relation("Team2")
   createdAt    DateTime   @default(now())
