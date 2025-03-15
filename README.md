@@ -67,27 +67,62 @@ Create a `.env` file inside the `backend/` directory with the following variable
 
 ```plaintext
 DATABASE_URL=postgresql://user:password@localhost:5432/tournament_db
-PORT=5000
-JWT_SECRET=your_secret_key
 ```
 
 ### **5️⃣ Run the application**
+You can run the application in two different ways: Locally (without Docker) or using Docker Compose for a fully containerized environment.
 
-#### 🏗 **Start the backend**
+#### 📌 Option 1: Run Locally (Without Docker)
+
+##### 🏗 **Start the backend**
 
 ```bash
 cd backend
-npm run dev
+npm install or yarn
+cp .env.example .env  # Configure DATABASE_URL in the .env file
+npm run dev or yarn dev
 ```
 
-#### 🎨 **Start the frontend**
+##### 🎨 **Start the frontend**
 
 ```bash
 cd frontend
-npm run dev
+npm install or yarn
+npm run dev or yarn dev
 ```
 
-The application will be available at **http://localhost:3000**
+➡️ The frontend will be accessible at http://localhost:3000
+➡️ The backend API will be running at http://localhost:5000
+
+#### 📌 Option 2: Run with Docker Compose
+This method automates the setup by creating the necessary containers for the database, backend, and frontend.
+
+```bash
+docker-compose up --build
+```
+➡️ This will start:
+
+PostgreSQL Database at localhost:5432
+Backend API at http://localhost:5000
+Frontend at http://localhost:3000
+
+##### 🛑 To stop all containers, run:
+
+```bash
+docker-compose down
+```
+
+##### 🧹 If you need to reset the database, add the -v flag to remove volumes:
+
+```bash
+docker-compose down -v
+```
+
+##### Then restart with:
+
+```bash
+docker-compose up --build
+```
 
 ---
 
@@ -103,7 +138,7 @@ It includes all available endpoints for tournaments, teams, and matches.
 
 ---
 
-## 🧪 **Running Tests**
+## 🧪 **Running Tests** (Not added / Future)
 
 ### **End-to-End Testing (Cypress)**
 
