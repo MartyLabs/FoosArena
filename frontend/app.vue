@@ -1,3 +1,9 @@
 <template>
-  <div class="bg-blue-500 text-white text-center">Tailwind fonctionne !</div>
+  <NuxtLayout>
+    <NuxtPage />
+  </NuxtLayout>
 </template>
+
+<script setup>
+import { Toaster } from "@meforma/vue-toaster";
+</script>
