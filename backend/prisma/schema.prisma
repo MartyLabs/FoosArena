@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tournament {
+  id          String   @id @default(uuid()) //ID Unique
+  name        String
+  description String?
+  date        DateTime
+  teams       Team[]
+  matches     Match[]
+  createdAt   DateTime @default(now())
+}
+
+model Team {
+  id           String     @id @default(uuid())
+  name         String
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  tournamentId String
+  // Virtual relationship to avoid breaking Prisma
+  matches1     Match[]    @relation("Team1")
+  matches2     Match[]    @relation("Team2")
+  createdAt    DateTime   @default(now())
+}
+
+model Match {
+  id           String     @id @default(uuid())
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  tournamentId String
+  team1        Team       @relation("Team1", fields: [team1Id], references: [id])
+  team1Id      String
+  team2        Team       @relation("Team2", fields: [team2Id], references: [id])
+  team2Id      String
+  score1       Int?
+  score2       Int?
+  winnerId     String?
+  createdAt    DateTime   @default(now())
+}

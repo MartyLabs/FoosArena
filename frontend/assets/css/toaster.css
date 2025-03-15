@@ -1,0 +1,45 @@
+/* 💡 Style général des toasts */
+.custom-toaster {
+  font-family: "Poppins", sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 5px 5px 0 black;
+  background-color: #ff4d4d;
+  transition: transform 0.2s ease-in-out;
+}
+
+/* ✅ Style pour les succès */
+.custom-toaster.success {
+  background: #4ade80;
+  color: black;
+  border: 3px solid black;
+}
+
+/* ❌ Style pour les erreurs */
+.custom-toaster.error {
+  background: #ff4d4d;
+  color: white;
+  border: 3px solid black;
+}
+
+/* ⚠️ Style pour les warnings */
+.custom-toaster.warning {
+  background: #ffcc00;
+  color: black;
+  border: 3px solid black;
+}
+
+/* ℹ️ Style pour les infos */
+.custom-toaster.info {
+  background: #1ac2ff;
+  color: white;
+  border: 3px solid black;
+}
+
+/* 💨 Effet hover */
+.custom-toaster:hover {
+  transform: scale(1.05);
+}
+// Update Sat Mar 15 08:29:15 PM CET 2025
