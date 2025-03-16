@@ -31,7 +31,7 @@
           <button class="score-btn" @click="incrementScore(2)">➕</button>
         </div>
 
-        <button @click="updateMatchScore" class="neo-btn neo-blue">
+        <button @click="updateScore" class="neo-btn neo-blue">
           ✅ Mettre à jour le score
         </button>
       </div>
@@ -40,9 +40,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, inject } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import axios from "axios";
+import { fetchMatchDetails, updateMatchScore } from "@/services/matchService";
 
 const toast = inject("toaster");
 const route = useRoute();
@@ -51,63 +51,64 @@ const match = ref({});
 const localScore1 = ref(0);
 const localScore2 = ref(0);
 
-// Retrieve match details
-const fetchMatchDetails = async () => {
+/**
+ * Load match details.
+ */
+const loadMatchDetails = async () => {
   try {
-    const response = await axios.get(
-      `http://localhost:5000/matches/single/${route.params.id}`
-    );
-    match.value = response.data.match;
+    match.value = await fetchMatchDetails(route.params.id);
     localScore1.value = match.value.score1 || 0;
     localScore2.value = match.value.score2 || 0;
   } catch (error) {
-    console.error("Error loading match", error);
     router.push("/");
   }
 };
 
-// Score update
-const updateMatchScore = async () => {
+/**
+ * Update match score.
+ */
+const updateScore = async () => {
   try {
-    await axios.post(
-      `http://localhost:5000/matches/update-score/${route.params.id}`,
-      {
-        score1: localScore1.value,
-        score2: localScore2.value,
-      }
+    await updateMatchScore(
+      route.params.id,
+      localScore1.value,
+      localScore2.value
     );
-
     toast.show("Score mis à jour avec succès ! 🎉", {
       type: "success",
       position: "top",
       duration: 3000,
-      type: "success",
       className: "custom-toaster success",
     });
   } catch (error) {
-    console.error("Error updating score", error);
     toast.show("Erreur lors de la mise à jour du score ❌", {
       type: "error",
       position: "top-right",
       duration: 3000,
-      type: "error",
       className: "custom-toaster error",
     });
   }
 };
 
-// Score increment/decrement
+/**
+ * Increment the score.
+ * @param {number} team - Team number (1 or 2).
+ */
 const incrementScore = (team) => {
   if (team === 1) localScore1.value++;
   else localScore2.value++;
 };
 
+/**
+ * Decrement the score.
+ * @param {number} team - Team number (1 or 2).
+ */
 const decrementScore = (team) => {
   if (team === 1 && localScore1.value > 0) localScore1.value--;
   else if (team === 2 && localScore2.value > 0) localScore2.value--;
 };
 
-onMounted(fetchMatchDetails);
+onMounted(loadMatchDetails);
 </script>
 
 <style scoped>

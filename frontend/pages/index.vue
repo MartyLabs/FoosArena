@@ -52,29 +52,39 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
-import CreateTournamentModal from "~/components/CreateTournamentModal.vue";
+import CreateTournamentModal from "~/components/modals/CreateTournamentModal.vue";
+import { fetchTournaments } from "@/services/tournamentService";
 import { truncateText } from "#imports";
 
 const tournaments = ref([]);
 const showModal = ref(false);
 
-const fetchTournaments = async () => {
+/**
+ * Load all tournaments.
+ */
+const loadTournaments = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/tournaments");
-    tournaments.value = response.data;
+    tournaments.value = await fetchTournaments();
   } catch (error) {
-    console.error("Error loading tournaments", error);
+    console.error("Error loading tournaments");
   }
 };
 
+/**
+ * Open the create tournament modal.
+ */
 const openModal = () => {
   showModal.value = true;
 };
 
+/**
+ * Format date.
+ * @param {string} date
+ * @returns {string} Formatted date
+ */
 const formatDate = (date) => new Date(date).toLocaleDateString();
 
-onMounted(fetchTournaments);
+onMounted(loadTournaments);
 </script>
 
 <style scoped>
@@ -188,6 +198,10 @@ onMounted(fetchTournaments);
 .empty-container {
   margin-top: 4rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   color: #444;
 }
 

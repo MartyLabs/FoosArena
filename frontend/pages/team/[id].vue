@@ -14,7 +14,7 @@
       <label class="section-title">Modifier le nom de l'équipe :</label>
       <div class="input-group">
         <input v-model="newName" type="text" class="neo-input" />
-        <button @click="updateTeamName" class="neo-btn neo-green">
+        <button @click="handleUpdateTeamName" class="neo-btn neo-green">
           ✅ Sauvegarder
         </button>
         <div class="delete-section">
@@ -31,7 +31,7 @@
         v-for="match in matches"
         :key="match.id"
         :match="match"
-        @update-score="updateScore"
+        @update-score="handleUpdateScore"
       />
     </div>
 
@@ -39,7 +39,7 @@
       v-if="showConfirmationModal"
       :message="'Êtes-vous sûr de vouloir supprimer cette équipe ? Cette action est irréversible et entraînera la suppression des matchs qui impliquent cette équipe.'"
       :close="() => (showConfirmationModal = false)"
-      :confirm="deleteTeam"
+      :confirm="handleDeleteTeam"
       :show="showConfirmationModal"
     />
   </div>
@@ -47,11 +47,12 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import axios from "axios";
-import MatchCard from "~/components/MatchCard.vue";
-import ConfirmationModal from "~/components/ConfirmationModal.vue";
+import { useRoute, useRouter } from "vue-router";
 import gsap from "gsap";
+import MatchCard from "~/components/match/MatchCard.vue";
+import ConfirmationModal from "~/components/modals/ConfirmationModal.vue";
+import { fetchTeam, updateTeamName, deleteTeam } from "@/services/teamService";
+import { fetchMatchesByTeam, updateMatchScore } from "@/services/matchService";
 
 const route = useRoute();
 const router = useRouter();
@@ -60,71 +61,75 @@ const matches = ref([]);
 const newName = ref("");
 const showConfirmationModal = ref(false);
 
-// Retrieving team information
-const fetchTeam = async () => {
+/**
+ * Load team data.
+ */
+const loadTeam = async () => {
   try {
-    const response = await axios.get(
-      `http://localhost:5000/teams/single/${route.params.id}`
-    );
-    team.value = response.data;
+    team.value = await fetchTeam(route.params.id);
     newName.value = team.value.name;
   } catch (error) {
-    console.error("Team loading error", error);
+    console.error("Error loading team");
   }
 };
 
-// Retrieve team matches
-const fetchMatches = async () => {
+/**
+ * Load matches played by this team.
+ */
+const loadMatches = async () => {
   try {
-    const response = await axios.get(
-      `http://localhost:5000/matches/team/${route.params.id}`
-    );
-    matches.value = response.data.matches;
+    matches.value = await fetchMatchesByTeam(route.params.id);
   } catch (error) {
-    console.error("Error loading matches", error);
+    console.error("Error loading matches");
   }
 };
 
+/**
+ * Confirm team deletion.
+ */
 const confirmDelete = () => {
   showConfirmationModal.value = true;
 };
 
-const deleteTeam = async () => {
+/**
+ * Delete the team and redirect to tournament page.
+ */
+const handleDeleteTeam = async () => {
   try {
-    await axios.delete(`http://localhost:5000/teams/${route.params.id}`);
+    await deleteTeam(route.params.id);
     router.push(`/tournament/${team.value.tournamentId}`);
   } catch (error) {
-    console.error("Team deletion error", error);
+    console.error("Error deleting team");
   }
 };
 
-const updateScore = async (matchId, score1, score2) => {
+/**
+ * Update match score.
+ */
+const handleUpdateScore = async (matchId, score1, score2) => {
   try {
-    await axios.post(`http://localhost:5000/matches/update-score/${matchId}`, {
-      score1,
-      score2,
-    });
-    fetchMatches();
+    await updateMatchScore(matchId, score1, score2);
+    loadMatches();
   } catch (error) {
-    console.error("Error updating score", error);
+    console.error("Error updating score");
   }
 };
 
-// Update team name
-const updateTeamName = async () => {
+/**
+ * Update team name.
+ */
+const handleUpdateTeamName = async () => {
   try {
-    await axios.put(`http://localhost:5000/teams/${route.params.id}`, {
-      name: newName.value,
-    });
+    await updateTeamName(route.params.id, newName.value);
     team.value.name = newName.value;
   } catch (error) {
-    console.error("Error updating name", error);
+    console.error("Error updating team name");
   }
 };
 
 onMounted(() => {
-  fetchTeam();
-  fetchMatches();
+  loadTeam();
+  loadMatches();
   gsap.from("h1", { opacity: 0, y: -20, duration: 0.5 });
 });
 </script>
@@ -150,18 +155,6 @@ onMounted(() => {
   font-weight: 900;
   text-transform: uppercase;
   color: white;
-}
-
-.desc {
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
-}
-
-.tournament-link {
-  color: yellow;
-  font-weight: bold;
-  text-decoration: underline;
 }
 
 .edit-section {
@@ -191,11 +184,6 @@ onMounted(() => {
   transition: 0.2s;
 }
 
-.neo-input:hover {
-  transform: translate(-3px, -3px);
-  box-shadow: 8px 8px 0 black;
-}
-
 .match-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -211,16 +199,6 @@ onMounted(() => {
   box-shadow: 5px 5px 0 black;
   transition: 0.2s;
   cursor: pointer;
-}
-
-.neo-btn:hover {
-  transform: translate(-3px, -3px);
-  box-shadow: 8px 8px 0 black;
-}
-
-.neo-btn:active {
-  transform: translate(3px, 3px);
-  box-shadow: 0 0 0 black;
 }
 
 .neo-green {

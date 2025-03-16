@@ -45,27 +45,24 @@
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import axios from "axios";
-import LeaderboardChart from "~/components/LeaderboardChart.vue";
+import LeaderboardChart from "~/components/tournament/LeaderboardChart.vue";
+import { fetchLeaderboard } from "@/services/tournamentService";
 import gsap from "gsap";
 
 const route = useRoute();
 const tournamentId = ref(route.params.id);
 const leaderboard = ref([]);
 
-// Recovering the ranking
-const fetchLeaderboard = async () => {
+const loadLeaderboard = async () => {
   try {
-    const response = await axios.get(
-      `http://localhost:5000/tournaments/${tournamentId.value}/leaderboard`
-    );
-    leaderboard.value = response.data;
+    leaderboard.value = await fetchLeaderboard(route.params.id);
   } catch (error) {
-    console.error("Error loading the classification", error);
+    console.error("Error loading leaderboard", error);
   }
 };
 
 onMounted(() => {
-  fetchLeaderboard();
+  loadLeaderboard();
   gsap.from(".animate-row", { opacity: 0, y: 20, stagger: 0.1, duration: 0.5 });
 });
 </script>

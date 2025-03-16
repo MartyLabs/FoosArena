@@ -15,7 +15,7 @@
           </div>
 
           <div class="button-group">
-            <button @click="createTeam" class="neo-btn neo-green">
+            <button @click="handleCreateTeam" class="neo-btn neo-green">
               ✅ Ajouter
             </button>
             <button @click="$emit('close')" class="neo-btn neo-red">
@@ -30,8 +30,8 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
 import gsap from "gsap";
+import { createTeam } from "@/services/teamService";
 
 const props = defineProps({
   tournamentId: String,
@@ -40,12 +40,12 @@ const props = defineProps({
 const name = ref("");
 const show = ref(true);
 
-const createTeam = async () => {
+/**
+ * Handle team creation.
+ */
+const handleCreateTeam = async () => {
   try {
-    await axios.post("http://localhost:5000/teams", {
-      name: name.value,
-      tournamentId: props.tournamentId,
-    });
+    await createTeam(props.tournamentId, name.value);
     window.location.reload();
   } catch (error) {
     console.error("Error adding team", error);

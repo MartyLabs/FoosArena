@@ -78,9 +78,9 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
-import TeamCard from "~/components/TeamCard.vue";
-import CreateTeamModal from "~/components/CreateTeamModal.vue";
-import ConfirmationModal from "~/components/ConfirmationModal.vue";
+import TeamCard from "~/components/team/TeamCard.vue";
+import CreateTeamModal from "~/components/modals/CreateTeamModal.vue";
+import ConfirmationModal from "~/components/modals/ConfirmationModal.vue";
 
 const route = useRoute();
 const router = useRouter();
