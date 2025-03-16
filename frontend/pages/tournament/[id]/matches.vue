@@ -22,39 +22,40 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import axios from "axios";
-import MatchCard from "~/components/MatchCard.vue";
+import MatchCard from "~/components/match/MatchCard.vue";
+import { fetchMatches, updateMatchScore } from "@/services/matchService";
 
 const route = useRoute();
 const tournamentId = ref(route.params.id);
 const matches = ref([]);
 
-// Match retrieval
-const fetchMatches = async () => {
+/**
+ * Load matches for the tournament.
+ */
+const loadMatches = async () => {
   try {
-    const response = await axios.get(
-      `http://localhost:5000/matches/${tournamentId.value}`
-    );
-    matches.value = response.data.matches;
+    matches.value = await fetchMatches(tournamentId.value);
   } catch (error) {
-    console.error("Erreur lors du chargement des matchs", error);
+    console.error("Error loading matches");
   }
 };
 
-// Updating a score
+/**
+ * Update match score and refresh matches.
+ * @param {string} matchId - The match ID.
+ * @param {number} score1 - Score for team 1.
+ * @param {number} score2 - Score for team 2.
+ */
 const updateScore = async (matchId, score1, score2) => {
   try {
-    await axios.post(`http://localhost:5000/matches/update-score/${matchId}`, {
-      score1,
-      score2,
-    });
-    fetchMatches();
+    await updateMatchScore(matchId, score1, score2);
+    await loadMatches();
   } catch (error) {
-    console.error("Erreur lors de la mise à jour du score", error);
+    console.error("Error updating match score");
   }
 };
 
-onMounted(fetchMatches);
+onMounted(loadMatches);
 </script>
 
 <style scoped>

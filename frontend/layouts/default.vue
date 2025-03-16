@@ -3,7 +3,7 @@
     <header class="navbar" :class="{ 'dark-mode': isDark }">
       <div class="navbar-container">
         <NuxtLink to="/" class="logo">
-          <img src="/logo.svg" alt="Logo" class="logo-img" />
+          <img src="public/logo.svg" alt="Logo" class="logo-img" />
           <span>FoosArena</span>
         </NuxtLink>
 
@@ -47,33 +47,41 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import { fetchTournaments } from "@/services/tournamentService";
 
 const dropdownOpen = ref(false);
 const tournaments = ref([]);
 const isDark = ref(false);
 
-const fetchTournaments = async () => {
+/**
+ * Load tournaments from the API.
+ */
+const loadTournaments = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/tournaments");
-    tournaments.value = response.data;
+    tournaments.value = await fetchTournaments();
   } catch (error) {
-    console.error("Erreur lors du chargement des tournois", error);
+    console.error("Error loading tournaments");
   }
 };
 
+/**
+ * Toggle dark mode and save preference in localStorage.
+ */
 const toggleDarkMode = () => {
   isDark.value = !isDark.value;
   localStorage.setItem("darkMode", isDark.value ? "enabled" : "disabled");
   document.documentElement.classList.toggle("dark", isDark.value);
 };
 
+/**
+ * Toggle dropdown visibility.
+ */
 const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value;
 };
 
 onMounted(() => {
-  fetchTournaments();
+  loadTournaments();
   const savedMode = localStorage.getItem("darkMode");
   isDark.value =
     savedMode === "enabled" ||
@@ -85,6 +93,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 🔥 NAVIGATION BAR STYLES */
 .navbar {
   width: 100%;
   background: #ff66a3;
@@ -126,6 +135,7 @@ onMounted(() => {
   margin-right: 8px;
 }
 
+/* 🔗 NAVIGATION LINKS */
 .nav-links {
   display: flex;
   align-items: center;
@@ -154,6 +164,7 @@ onMounted(() => {
   border: 3px solid white;
 }
 
+/* ⬇️ DROPDOWN MENU */
 .dropdown {
   position: relative;
 }
@@ -185,6 +196,7 @@ onMounted(() => {
   background: #ffcc00;
 }
 
+/* 🌙 DARK MODE TOGGLE */
 .toggle-container {
   cursor: pointer;
   display: flex;
@@ -256,6 +268,7 @@ onMounted(() => {
   opacity: 1;
 }
 
+/* 📄 PAGE CONTENT */
 .page-content {
   background: #f9f5f3;
   min-height: 100vh;

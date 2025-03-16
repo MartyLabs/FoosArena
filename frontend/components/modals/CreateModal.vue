@@ -12,7 +12,7 @@
       />
 
       <button
-        @click="createTeam"
+        @click="handleCreateTeam"
         class="mt-4 bg-green-500 text-white px-4 py-2 rounded"
       >
         ✅ Ajouter
@@ -26,20 +26,24 @@
 
 <script setup>
 import { ref } from "vue";
-import axios from "axios";
+import { createTeam } from "@/services/teamService";
 
 const props = defineProps({
   tournamentId: String,
 });
 
+const emit = defineEmits(["close"]);
 const name = ref("");
 
-const createTeam = async () => {
+/**
+ * Handle team creation.
+ */
+const handleCreateTeam = async () => {
+  if (!name.value.trim()) return;
+
   try {
-    await axios.post("http://localhost:5000/teams", {
-      name: name.value,
-      tournamentId: props.tournamentId,
-    });
+    await createTeam(props.tournamentId, name.value);
+    emit("close");
     window.location.reload();
   } catch (error) {
     console.error("Error adding team", error);

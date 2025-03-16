@@ -1,10 +1,10 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-container">
-      <!-- En-tête -->
+      <!-- Modal Header -->
       <div class="modal-header">🏆 Nouveau Tournoi</div>
 
-      <!-- Formulaire -->
+      <!-- Form -->
       <div class="modal-body">
         <div class="input__container">
           <div class="shadow__input"></div>
@@ -32,7 +32,7 @@
       </div>
 
       <div class="modal-footer">
-        <button @click="createTournament" class="btn btn-primary">
+        <button @click="handleCreateTournament" class="btn btn-primary">
           ✅ Créer
         </button>
         <button @click="$emit('close')" class="btn btn-secondary">
@@ -45,15 +45,18 @@
 
 <script setup>
 import { ref } from "vue";
-import axios from "axios";
+import { createTournament } from "@/services/tournamentService";
 
 const name = ref("");
 const date = ref("");
 const description = ref("");
 
-const createTournament = async () => {
+/**
+ * Handles the creation of a new tournament.
+ */
+const handleCreateTournament = async () => {
   try {
-    await axios.post("http://localhost:5000/tournaments", {
+    await createTournament({
       name: name.value,
       date: date.value,
       description: description.value,
