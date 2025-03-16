@@ -46,4 +46,3 @@ const createTeam = async () => {
   }
 };
 </script>
-// Update Sat Mar 15 08:29:16 PM CET 2025

@@ -32,4 +32,3 @@ defineProps({
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 </style>
-// Update Sat Mar 15 08:29:16 PM CET 2025

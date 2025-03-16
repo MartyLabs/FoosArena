@@ -287,4 +287,3 @@ onMounted(fetchMatchDetails);
   background: #1ac2ff;
 }
 </style>
-// Update Sat Mar 15 08:29:15 PM CET 2025

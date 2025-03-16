@@ -129,4 +129,3 @@ onMounted(fetchMatches);
   box-shadow: 0 0 0 black;
 }
 </style>
-// Update Sat Mar 15 08:29:16 PM CET 2025

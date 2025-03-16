@@ -120,4 +120,3 @@ const localScore2 = ref(props.match.score2 || 0);
   background: #0099e5;
 }
 </style>
-// Update Sat Mar 15 08:29:16 PM CET 2025

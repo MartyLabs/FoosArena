@@ -221,4 +221,3 @@ onMounted(fetchTournaments);
   animation: fadeInUp 0.4s ease-out forwards;
 }
 </style>
-// Update Sat Mar 15 08:29:15 PM CET 2025

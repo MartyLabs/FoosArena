@@ -10,7 +10,7 @@ exports.generateMatches = async (req, res) => {
 
     logger.info(`Generating matches for tournament: ${tournamentId}`);
 
-    // Vérifier si le tournoi existe
+    // Check if the tournament exists
     const tournament = await prisma.tournament.findUnique({
       where: { id: tournamentId },
       include: { teams: true },
@@ -27,7 +27,7 @@ exports.generateMatches = async (req, res) => {
       return res.status(400).json({ message: "At least 2 teams are required" });
     }
 
-    // Génération des matchs
+    // Match generation
     const matches = teams.flatMap((team1, i) =>
       teams.slice(i + 1).map((team2) => ({
         tournamentId,
@@ -71,12 +71,12 @@ exports.updateMatchScore = async (req, res) => {
       return res.status(404).json({ message: "Match not found" });
     }
 
-    // Déterminer le gagnant
+    // Determining the winner
     let winnerId = null;
     if (score1 > score2) winnerId = match.team1Id;
     else if (score2 > score1) winnerId = match.team2Id;
 
-    // Mise à jour du score
+    // Score update
     const updatedMatch = await prisma.match.update({
       where: { id: matchId },
       data: { score1, score2, winnerId },

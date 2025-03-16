@@ -235,4 +235,3 @@ onMounted(() => {
   background: #e52020;
 }
 </style>
-// Update Sat Mar 15 08:29:16 PM CET 2025

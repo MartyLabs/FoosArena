@@ -1,9 +1,7 @@
 <template>
   <div class="container">
-    <!-- Retour -->
     <div class="flex flex-row justify-between">
       <NuxtLink to="/" class="back-link">⬅ Retour à l'accueil</NuxtLink>
-      <!-- 🔥 Bouton Leaderboard -->
       <div class="flex flex-row gap-5">
         <NuxtLink
           :to="`/tournament/${tournament.id}/leaderboard`"
@@ -18,7 +16,6 @@
       </div>
     </div>
 
-    <!-- Carte du tournoi -->
     <div class="tournament-card">
       <h1 class="title">🏆 {{ tournament.name }}</h1>
       <p class="desc">{{ tournament.description }}</p>
@@ -27,7 +24,6 @@
       </p>
     </div>
 
-    <!-- Liste des équipes -->
     <div class="teams-section">
       <h2 class="section-title">👥 Équipes participantes</h2>
       <div class="grid">
@@ -35,14 +31,11 @@
       </div>
     </div>
 
-    <!-- Actions -->
     <div class="button-group">
-      <!-- Ajouter une équipe -->
       <button @click="showModal = true" class="neo-btn neo-green">
         ➕ Ajouter une équipe
       </button>
 
-      <!-- Générer les matchs -->
       <button
         @click="handleMatchGeneration"
         :disabled="teams.length < 2"
@@ -52,20 +45,17 @@
         ⚔️ Générer les matchs
       </button>
 
-      <!-- Voir les matchs -->
       <button v-if="hasMatches" @click="viewMatches" class="neo-btn neo-orange">
         📺 Voir les matchs
       </button>
     </div>
 
-    <!-- Modal pour ajouter une équipe -->
     <CreateTeamModal
       v-if="showModal"
       :tournamentId="tournament.id"
       @close="showModal = false"
     />
 
-    <!-- Modal de Confirmation -->
     <ConfirmationModal
       v-if="showConfirmationModal"
       :message="'Des matchs existent déjà. Voulez-vous les supprimer et en recréer ?'"
@@ -311,4 +301,3 @@ onMounted(() => {
   margin-top: 25px;
 }
 </style>
-// Update Sat Mar 15 08:29:16 PM CET 2025
